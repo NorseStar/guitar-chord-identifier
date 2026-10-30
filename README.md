@@ -80,9 +80,9 @@ my own recordings instead of assuming that a good validation score was enough.
 
 For the current 11-chord experiment, I used 99 recordings for training and kept
 33 for validation. Each chord and playing style had three recordings in training
-and one in validation. The model got **27 out of 33 right (81.8%)**, with D and Dm
-causing most of the problems. Macro precision was **0.848**, recall **0.818** and
-F1 **0.825**. These averages give each chord equal weight. The full results and
+and one in validation. The model got 27 out of 33 right (81.8%), with D and Dm
+causing most of the problems. Macro precision was 0.848, recall 0.818 and
+F1 0.825. These averages give each chord equal weight. The full results and
 confusion matrix are in [reports/personal_11](reports/personal_11/).
 
 The accuracy dropped after adding more chords, but the validation recordings
