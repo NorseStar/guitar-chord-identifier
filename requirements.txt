@@ -1,0 +1,13 @@
+huggingface_hub
+librosa
+numpy
+pandas
+matplotlib
+scikit-learn
+jupyter
+soundfile
+joblib
+
+ipython
+gradio==6.30.0
+imageio-ffmpeg==0.6.0

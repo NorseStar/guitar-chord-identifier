@@ -1,0 +1,78 @@
+{
+  "recordings": 84,
+  "correct": 59,
+  "accuracy": 0.7023809523809523,
+  "top3_accuracy": 0.9404761904761905,
+  "abstentions_or_errors": 0,
+  "model_sha256": "822aca7475e3ce1ebb43855911882049f6041053b2cc8e132f5b1a846979d803",
+  "model_preprocessing": {
+    "sr": 22050,
+    "duration": 3.0,
+    "top_db": 30.0,
+    "min_duration": 1.0
+  },
+  "label_basis": "user-confirmed chord folders; techniques from recording order",
+  "scope": "Seven chords from one personal collection, all 24 model outputs allowed; no retraining.",
+  "classification_report": {
+    "A": {
+      "precision": 1.0,
+      "recall": 0.16666666666666666,
+      "f1-score": 0.2857142857142857,
+      "support": 12.0
+    },
+    "Am": {
+      "precision": 0.5217391304347826,
+      "recall": 1.0,
+      "f1-score": 0.6857142857142857,
+      "support": 12.0
+    },
+    "C": {
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.8,
+      "support": 12.0
+    },
+    "D": {
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.8,
+      "support": 12.0
+    },
+    "E": {
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1-score": 0.75,
+      "support": 12.0
+    },
+    "Em": {
+      "precision": 1.0,
+      "recall": 0.5833333333333334,
+      "f1-score": 0.7368421052631579,
+      "support": 12.0
+    },
+    "G": {
+      "precision": 0.9090909090909091,
+      "recall": 0.8333333333333334,
+      "f1-score": 0.8695652173913043,
+      "support": 12.0
+    },
+    "micro avg": {
+      "precision": 0.7468354430379747,
+      "recall": 0.7023809523809523,
+      "f1-score": 0.7239263803680982,
+      "support": 84.0
+    },
+    "macro avg": {
+      "precision": 0.8615471485036703,
+      "recall": 0.7023809523809523,
+      "f1-score": 0.7039765562975762,
+      "support": 84.0
+    },
+    "weighted avg": {
+      "precision": 0.8615471485036702,
+      "recall": 0.7023809523809523,
+      "f1-score": 0.7039765562975763,
+      "support": 84.0
+    }
+  }
+}

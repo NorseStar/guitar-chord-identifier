@@ -1,0 +1,4 @@
+technique,recordings,correct,accuracy
+downstrum,28,23,0.8214285714285714
+repeated_strumming,28,15,0.5357142857142857
+slow_picking,28,21,0.75
