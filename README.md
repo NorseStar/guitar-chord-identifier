@@ -12,10 +12,11 @@ different types of guitars, playstyles and voicings while adding them all as lab
 but I quickly realised that the scope of the project would be too big after first
 testing around with my first guitar chord audio data set. More of that is explained later.
 
-I measure accuracy, per-chord precision, recall, F1 and a confusion matrix.
-For live use, stability and the delay after a chord change also matter. Model
-scores are not calibrated confidence, and the system cannot identify chords
-outside its supported classes reliably.
+To check whether it works, I look at accuracy, precision, recall and F1, along
+with a confusion matrix to see which chords get mixed up. For live feedback,
+I also want to see how quickly it catches up when I change chords. A high score
+on the website does not necessarily mean the prediction is right, especially
+if I play a chord it was never trained on.
 
 ## 2. Data
 
@@ -35,11 +36,11 @@ being great at predicting chords from my own, personal guitar, I decided to reco
 
 I then recorded my own guitar using my phone. There are now 132 recordings,
 12 per chord. Folder names provide the chord labels. Files are sorted by their
-recording number within each folder, not across folders. The 11 chords have four 
-downstrums, four repeated-strumming takes and four slow-picking
-takes. Thumb/nail and voicing details were not logged per file. And while my sample
-size is small (I am just one person though, so I forgive myself), it was surprisingly 
-accurate for how little recordings I had for each chord.
+recording number within each folder, not across folders. I followed the same
+pattern for all 11 chords: four single strums, four repeated-strumming recordings,
+and four slow strums/picking recordings. Thumb/nail and voicing details were not logged 
+per file. And while my sample size is small (I am just one person though, so I forgive myself), 
+it was surprisingly accurate for how little recordings I had for each chord.
 
 My original M4A files are preserved while analysis uses decoded WAV copies. Audio is
 converted to mono at 22,050 Hz in order to standardise a sampling rate. Quiet parts 
@@ -48,13 +49,18 @@ seconds are retained without padding. Each recording becomes 12 mean chroma valu
 representing pitch classes rather than octave or note order. A two-second crop previously
 cut off a picked note, hence I upped the crop amount to 3 seconds.
 
-Decoded WAV copies are generated locally. Microphone audio is processed by the local Gradio server.
+I included the 132 original training recordings and the trained model in this
+repository so the project can be run and retrained. The WAV copies are generated
+locally. The separate headset checks and unused noise recordings are not included.
+Microphone audio is processed by the local Gradio server.
 
 ## 3. Modeling
 
-I use a Random Forest with 300 trees and seed 42. The original dataset baseline
-used balanced class weights and the personal model uses the classifier defaults.
-KNN and SVM remain possible comparisons, not completed experiments.
+I started with a Random Forest, using 300 trees and a fixed random seed of 42
+so I could repeat the experiment. The original dataset model used balanced
+class weights, while the model trained on my own recordings uses the defaults.
+I had also considered comparing KNN and SVM, but so far I have focused on getting
+one model working with my guitar.
 
 | Experiment | Evaluation recordings | Accuracy |
 | --- | ---: | ---: |
@@ -64,40 +70,71 @@ KNN and SVM remain possible comparisons, not completed experiments.
 | Personal seven-chord model | 21 validation | 90.5% |
 | Personal eleven-chord model | 33 validation | 81.8% |
 
-The current split has 99 training and 33 validation recordings: one of each four
-chord/technique takes is held aside. Macro precision is **0.848**, recall **0.818**
-and F1 **0.825**. Detailed results and the confusion matrix are in
-[reports/personal_11](reports/personal_11/). D and Dm account for most mistakes.
-These are small within-collection splits, and the seven- and eleven-class
-results do not use an identical validation set. They are not a controlled
-measurement of the effect of adding classes.
+The original model looked good on its validation recordings, but that did not
+carry over as well to my own guitar. It got 59 of my first 84 recordings right,
+with A often being mistaken for Am. This was why I moved on to training with
+my own recordings instead of assuming that a good validation score was enough.
 
-After validation, a separate model is fitted on all 132 recordings for the app.
-It needs fresh recordings for independent evaluation. The phone/headset change
-also introduces a recording-condition difference.
+For the current 11-chord experiment, I used 99 recordings for training and kept
+33 for validation. Each chord and playing style had three recordings in training
+and one in validation. The model got **27 out of 33 right (81.8%)**, with D and Dm
+causing most of the problems. Macro precision was **0.848**, recall **0.818** and
+F1 **0.825**. These averages give each chord equal weight. The full results and
+confusion matrix are in [reports/personal_11](reports/personal_11/).
 
-An informal seven-chord headset check got six of seven right before manual
-trimming. Six saved E/Em checks then got five right. In one repeated E recording,
-shuffling started the crop at 0.89 s, before the main playing near 2.74 s.
-Notebook 06 tried stricter and sustained-volume start rules: E's score rose from
-40% to about 86%, but all rules still got five of six right. A fast E strum remained
-mistaken for Em. A stricter rule also skipped more of a slow-picked recording.
-The app's file-trimming settings therefore remain unchanged.
+The accuracy dropped after adding more chords, but the validation recordings
+also changed, so I cannot say that the extra chords alone caused the drop.
+There are only three validation recordings per chord, and they come from the
+same collection as the training recordings. I still need fresh recordings to
+get a better idea of how well it works in practice.
+
+After checking validation, I trained a separate model on all 132 recordings for
+the website. That means the 33 validation recordings are now part of this model's
+training data too. Testing it on those again would not be an independent check.
+
+### Trying my headset and investigating mistakes
+
+With the earlier seven-chord model, I tried playing each chord through my
+headset microphone. Six of seven were right on the first attempt. Em was
+predicted as E, but changed to Em after I manually trimmed the recording.
+This made me wonder how much the crop was affecting the prediction.
+
+I saved six more E/Em recordings to look into it. Five were right, but a fast E
+strum was mistaken for Em. I also noticed that shuffling noises could start the
+automatic crop before I actually played. In one repeated E recording, the crop
+started at 0.89 seconds while the main playing started around 2.74 seconds.
+Almost two seconds of the three-second window were being spent on the lead-in.
+
+Notebook 06 compares a stricter volume threshold with requiring sound to last
+briefly before accepting it as the start. E's score went from about 40% to 86%,
+but all the settings still got five of six recordings right. The fast-strum
+mistake did not go away. The stricter threshold also skipped more of a slow-picked
+recording, so I have kept the original file-trimming settings for now. Getting a
+higher score on one recording is not enough reason to change the whole pipeline.
 
 ## 4. Deployment
 
-The Gradio website supports uploads, single microphone recordings and a live
-microphone section. Live audio uses a rolling three-second buffer with updates
-requested every 0.5 seconds. It starts predicting after one second of usable
-audio, without repeatedly trimming each window. Scores are smoothed using 60%
-new and 40% previous scores, and a graph shows the last 30 seconds. Each browser
-session has its own buffer. Quiet chunks clear the buffer and prediction.
+I used Gradio because I wanted a simple way to try the model without spending
+most of the project building a user interface. The website lets me upload a
+recording, record one chord through the microphone, or leave the microphone
+running for live feedback.
 
-This is a first live version: a window can contain two chords during a change,
-and smoothing adds delay. Silence rejection does not distinguish all noise from
-guitar. Automated buffer and audio tests pass, but live microphone accuracy and
-latency still need hands-on testing. Streaming sessions currently have a one-hour
-limit; stop and restart recording for another session.
+The live version keeps the latest three seconds of audio and requests a new
+prediction every half second. It starts predicting once it has at least one
+second of usable audio. Unlike the uploaded recordings, these windows are not
+trimmed each time, since I may already be in the middle of playing a chord.
+
+The scores are smoothed using 60% of the new scores and 40% of the previous
+smoothed scores. This is intended to make the display less jumpy, although it
+also adds some delay. A graph shows the last 30 seconds, and quiet audio clears
+the current prediction and buffer. This still does not mean it can tell every
+background noise apart from a guitar.
+
+The live version is implemented and the automated audio and buffer tests pass.
+I still need to test how well it follows actual chord changes through my headset.
+The three-second window can contain parts of two chords when I switch, which
+may confuse it for a while. Recording sessions currently have a one-hour limit;
+stopping and starting again begins a new session.
 
 ### Run the website
 
@@ -139,10 +176,12 @@ For the public dataset baseline, run `download_dataset.py`, then
 Earlier experiments are in notebooks 01–06 and the
 [dated notes](reports/experiment_notes_through_28_october.md).
 
-The website currently runs locally. A screencast or public deployment link is
-still needed for submission. Future checks should log fresh chord labels and
-predictions, especially D/Dm, and measure how long live predictions take to
-settle. More datasets, speech mixtures and a separate noise detector can wait.
+For now, the website runs locally. I still need to provide a screencast or a
+public deployment link for submission. My next step is to try fresh recordings,
+especially D and Dm, and see how long the live prediction takes to catch up when
+I switch chords. Adding more datasets, mixing speech into recordings and training
+a separate noise detector are ideas I may return to, but they are outside the
+current scope.
 
 ## 5. References
 
