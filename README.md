@@ -3,6 +3,9 @@ Marcus · Last updated: 30th of October 2026
 
 [GitHub repository](https://github.com/NorseStar/guitar-chord-identifier)
 
+**Video demonstration.** I play guitar and show how the website responds.
+[Download part 1 (MOV)](https://github.com/NorseStar/guitar-chord-identifier/releases/download/guitar-demo/demo-1.mov) · [Download part 2 (MP4)](https://github.com/NorseStar/guitar-chord-identifier/releases/download/guitar-demo/demo-2.mp4)
+
 ## 1. Describe the problem
 
 I wanted to make a basic guitar chord recognition software. The current scope 
