@@ -11,3 +11,4 @@ models/*
 
 !models/my_guitar_rf.joblib
 .publish/
+/demo-videos/

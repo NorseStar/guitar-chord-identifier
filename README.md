@@ -130,11 +130,12 @@ also adds some delay. A graph shows the last 30 seconds, and quiet audio clears
 the current prediction and buffer. This still does not mean it can tell every
 background noise apart from a guitar.
 
-The live version is implemented and the automated audio and buffer tests pass.
-I still need to test how well it follows actual chord changes through my headset.
-The three-second window can contain parts of two chords when I switch, which
-may confuse it for a while. Recording sessions currently have a one-hour limit;
-stopping and starting again begins a new session.
+When I tried playing songs through my headset, the model could often follow a
+chord while I stayed on it. I got more consistent predictions from uploaded
+single strums. During chord changes I kept seeing Bm, even when I wasn't
+playing it. The three-second window can contain both chords at once, which may
+explain some of those mistakes. This was an informal playing test, so I don't
+have an accuracy figure for live use.
 
 ### Run the website
 
@@ -176,12 +177,8 @@ For the public dataset baseline, run `download_dataset.py`, then
 Earlier experiments are in notebooks 01–06 and the
 [dated notes](reports/experiment_notes_through_28_october.md).
 
-For now, the website runs locally. I still need to provide a screencast or a
-public deployment link for submission. My next step is to try fresh recordings,
-especially D and Dm, and see how long the live prediction takes to catch up when
-I switch chords. Adding more datasets, mixing speech into recordings and training
-a separate noise detector are ideas I may return to, but they are outside the
-current scope.
+The website runs locally. I recorded two videos where I play guitar and
+briefly explain how the website works.
 
 ## 5. References
 
